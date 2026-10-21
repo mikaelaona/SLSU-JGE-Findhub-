@@ -1,0 +1,1097 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#123d2b">
+
+    <title>{% block title %}SLSU-JGE FindHub{% endblock %}</title>
+
+    <meta name="description" content="SLSU-JGE FindHub - A Lost and Found platform for the Southern Luzon State University Judge Guillermo Eleazar Tagkawayan Campus.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        :root {
+            --primary: #174b35;
+            --primary-dark: #103625;
+            --primary-light: #e8f3ec;
+            --accent: #d6b45c;
+            --background: #f5f7f5;
+            --surface: #ffffff;
+            --text: #1c2922;
+            --muted: #718078;
+            --border: #e3e9e5;
+            --success: #23834f;
+            --danger: #c43e3e;
+            --warning: #a66b13;
+            --radius: 16px;
+            --shadow: 0 8px 30px rgba(20, 56, 38, .06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background .25s, color .25s;
+        }
+
+        body, input, button, select, textarea {
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button, input, select, textarea {
+            font-size: inherit;
+        }
+
+        button, a {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, .97);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+        }
+
+        .navbar {
+            width: min(1180px, calc(100% - 40px));
+            min-height: 76px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .brand-logo {
+            width: 47px;
+            height: 47px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 21px;
+            box-shadow: 0 5px 14px rgba(23, 75, 53, .16);
+        }
+
+        .brand-name {
+            display: block;
+            font-family: 'Manrope', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -.7px;
+            line-height: 1.2;
+            color: var(--primary);
+        }
+
+        .brand-subtitle {
+            display: block;
+            margin-top: 4px;
+            font-size: 10px;
+            line-height: 1.3;
+            color: var(--muted);
+            letter-spacing: .65px;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: #536259;
+            font-size: 13px;
+            font-weight: 700;
+            transition: .2s ease;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-link.admin-link {
+            background: var(--primary);
+            color: white;
+            padding: 11px 15px;
+        }
+
+        .nav-link.admin-link:hover {
+            background: var(--primary-dark);
+        }
+
+        .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 12px;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--surface);
+            color: var(--text);
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: .2s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        #themeIcon {
+            font-size: 17px;
+            line-height: 1;
+        }
+
+        .mobile-menu {
+            display: none;
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            background: white;
+            color: var(--primary);
+            font-size: 19px;
+        }
+
+        .page-container {
+            width: min(1180px, calc(100% - 40px));
+            flex: 1;
+            margin: 0 auto;
+            padding-top: 32px;
+            padding-bottom: 55px;
+        }
+
+        .page-container:has(.home-hero) {
+            padding-top: 0;
+        }
+
+        .flash-container {
+            margin-bottom: 24px;
+        }
+
+        .flash-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 15px 17px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: white;
+            font-size: 14px;
+            box-shadow: var(--shadow);
+            animation: appear .25s ease;
+        }
+
+        .flash-message i {
+            margin-top: 3px;
+        }
+
+        .flash-success {
+            color: #176b3b;
+            background: #edf8f0;
+            border-color: #cdebd5;
+        }
+
+        .flash-error, .flash-danger {
+            color: #a92d2d;
+            background: #fff0f0;
+            border-color: #f2cccc;
+        }
+
+        .flash-warning {
+            color: #8a5b10;
+            background: #fff8e8;
+            border-color: #f0dfb6;
+        }
+
+        .flash-info {
+            color: #245b86;
+            background: #eef7ff;
+            border-color: #d3e8f8;
+        }
+
+        .site-footer {
+            margin-top: auto;
+            padding: 30px 20px;
+            background: #102e21;
+            color: #d6e2d9;
+        }
+
+        .footer-inner {
+            width: min(1180px, 100%);
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .footer-brand {
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
+            font-size: 16px;
+            color: white;
+        }
+
+        .footer-description {
+            max-width: 530px;
+            margin-top: 5px;
+            color: #aabdb0;
+            font-size: 12px;
+        }
+
+        .footer-copy {
+            color: #aabdb0;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        .section-heading {
+            margin-bottom: 22px;
+        }
+
+        .section-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 8px;
+            color: var(--success);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .section-title {
+            font-family: 'Manrope', sans-serif;
+            font-size: clamp(23px, 3vw, 34px);
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.25;
+        }
+
+        .section-description {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 9px;
+            min-height: 43px;
+            padding: 11px 17px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: background .2s, transform .2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            border-color: var(--border);
+            background: white;
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-danger {
+            background: #fff0f0;
+            color: var(--danger);
+            border-color: #f4d3d3;
+        }
+
+        .btn-danger:hover {
+            background: #ffe2e2;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            color: #33443a;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .form-control {
+            width: 100%;
+            min-height: 45px;
+            padding: 11px 13px;
+            border: 1px solid #dce4de;
+            border-radius: 10px;
+            outline: none;
+            background: #fff;
+            color: var(--text);
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .form-control:focus {
+            border-color: #4b8a66;
+            box-shadow: 0 0 0 3px rgba(57, 133, 83, .11);
+        }
+
+        textarea.form-control {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .form-help {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 100px;
+            background: #edf3ef;
+            color: #3d5748;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .status-badge.lost {
+            background: #fff0ed;
+            color: #b94332;
+        }
+
+        .status-badge.found {
+            background: #eaf6ee;
+            color: #267447;
+        }
+
+        .status-badge.returned {
+            background: #eaf2ff;
+            color: #2d5c9c;
+        }
+
+        .empty-state {
+            padding: 45px 20px;
+            border: 1px dashed #ccd8cf;
+            border-radius: var(--radius);
+            background: rgba(255,255,255,.7);
+            text-align: center;
+        }
+
+        .empty-state i {
+            margin-bottom: 15px;
+            color: #a2b6a8;
+            font-size: 35px;
+        }
+
+        .empty-state h3 {
+            font-family: 'Manrope', sans-serif;
+            font-size: 19px;
+        }
+
+        .empty-state p {
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            background: white;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .data-table th {
+            padding: 14px 16px;
+            background: #f5f8f5;
+            color: #64736a;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 15px 16px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr:hover {
+            background: #fafcfb;
+        }
+
+        .data-table select {
+            min-width: 110px;
+        }
+
+        .text-muted {
+            color: var(--muted);
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* DARK MODE */
+
+        body.dark-mode {
+            --primary: #80c99b;
+            --primary-dark: #5eaf7d;
+            --primary-light: #263f32;
+            --background: #101a14;
+            --surface: #1a2820;
+            --text: #edf5ef;
+            --muted: #a6b8ab;
+            --border: #304337;
+            --success: #80c99b;
+            --danger: #ff8585;
+            --warning: #e9bd6a;
+            --shadow: 0 8px 30px rgba(0, 0, 0, .18);
+        }
+
+        body.dark-mode .site-header {
+            background: rgba(20, 33, 25, .97);
+        }
+
+        body.dark-mode .brand-name {
+            color: var(--primary);
+        }
+
+        body.dark-mode .brand-subtitle,
+        body.dark-mode .nav-link {
+            color: var(--muted);
+        }
+
+        body.dark-mode .nav-link:hover,
+        body.dark-mode .theme-toggle:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        body.dark-mode .nav-link.admin-link {
+            background: #28583c;
+            color: #fff;
+        }
+
+        body.dark-mode .mobile-menu,
+        body.dark-mode .nav-links {
+            background: var(--surface);
+            color: var(--text);
+            border-color: var(--border);
+        }
+
+        body.dark-mode .theme-toggle,
+        body.dark-mode .btn-outline,
+        body.dark-mode .form-control,
+        body.dark-mode .table-wrapper,
+        body.dark-mode .flash-message,
+        body.dark-mode .empty-state {
+            background: var(--surface);
+            color: var(--text);
+            border-color: var(--border);
+        }
+
+        body.dark-mode .form-label {
+            color: #dce9df;
+        }
+
+        body.dark-mode .form-control::placeholder {
+            color: #8fa395;
+        }
+
+        body.dark-mode .data-table th {
+            background: #22352a;
+            color: #c4d7c9;
+        }
+
+        body.dark-mode .data-table td {
+            border-color: var(--border);
+        }
+
+        body.dark-mode .data-table tbody tr:hover {
+            background: #22352a;
+        }
+
+        body.dark-mode .flash-success {
+            background: #1d3928;
+            color: #a8e8bb;
+        }
+
+        body.dark-mode .flash-error,
+        body.dark-mode .flash-danger {
+            background: #402525;
+            color: #ffb0b0;
+        }
+
+        body.dark-mode .flash-warning {
+            background: #3c3220;
+            color: #f2d28b;
+        }
+
+        body.dark-mode .flash-info {
+            background: #203447;
+            color: #b4d9fa;
+        }
+
+        body.dark-mode .status-badge {
+            background: #2a3c30;
+            color: #d5e7da;
+        }
+
+        body.dark-mode .status-badge.lost {
+            background: #432a26;
+            color: #ffb2a5;
+        }
+
+        body.dark-mode .status-badge.found {
+            background: #203d2b;
+            color: #a8e8bb;
+        }
+
+        body.dark-mode .status-badge.returned {
+            background: #253752;
+            color: #b9d3ff;
+        }
+
+        body.dark-mode .btn-danger {
+            background: #402525;
+            color: #ffb0b0;
+            border-color: #603535;
+        }
+
+        body.dark-mode .site-footer {
+            background: #0b120e;
+        }
+
+        body.dark-mode .flash-success,
+        body.dark-mode .flash-error,
+        body.dark-mode .flash-danger,
+        body.dark-mode .flash-warning,
+        body.dark-mode .flash-info {
+            border-color: var(--border);
+        }
+
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 1050px) {
+            .navbar {
+                gap: 10px;
+            }
+
+            .nav-links {
+                gap: 3px;
+            }
+
+            .nav-link {
+                padding: 9px;
+                font-size: 12px;
+            }
+
+            .theme-toggle {
+                padding: 9px;
+            }
+
+            .brand-subtitle {
+                max-width: 190px;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .navbar {
+                min-height: 68px;
+                width: calc(100% - 30px);
+                gap: 10px;
+            }
+
+            .brand-logo {
+                width: 41px;
+                height: 41px;
+                border-radius: 12px;
+                font-size: 18px;
+            }
+
+            .brand-name {
+                font-size: 17px;
+            }
+
+            .brand-subtitle {
+                max-width: 190px;
+                font-size: 8px;
+            }
+
+            .mobile-menu {
+                display: grid;
+                place-items: center;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: calc(100% + 1px);
+                left: 0;
+                right: 0;
+                padding: 14px 20px 18px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 5px;
+                border-bottom: 1px solid var(--border);
+                background: white;
+                box-shadow: 0 12px 20px rgba(0,0,0,.06);
+            }
+
+            .nav-links.open {
+                display: flex;
+            }
+
+            .nav-link {
+                display: flex;
+                width: 100%;
+                padding: 12px;
+                font-size: 13px;
+            }
+
+            .nav-link.admin-link {
+                justify-content: center;
+                margin-top: 5px;
+            }
+
+            .nav-links form {
+                width: 100%;
+            }
+
+            .theme-toggle {
+                margin-left: auto;
+                padding: 9px 10px;
+                font-size: 11px;
+            }
+
+            .page-container {
+                width: calc(100% - 30px);
+                padding-top: 24px;
+                padding-bottom: 38px;
+            }
+
+            .page-container:has(.home-hero) {
+                padding-top: 0;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .footer-copy {
+                text-align: left;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .brand {
+                gap: 8px;
+            }
+
+            .brand-name {
+                font-size: 15px;
+            }
+
+            .brand-subtitle {
+                max-width: 145px;
+                font-size: 7px;
+                letter-spacing: .3px;
+            }
+
+            .theme-label {
+                display: none;
+            }
+
+            .theme-toggle {
+                width: 38px;
+                height: 38px;
+                padding: 7px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <header class="site-header">
+        <nav class="navbar" aria-label="Main navigation">
+
+            <a class="brand" href="{{ url_for('index') }}" aria-label="SLSU-JGE FindHub Home">
+                <span class="brand-logo">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                </span>
+
+                <span>
+                    <span class="brand-name">SLSU-JGE FindHub</span>
+                    <span class="brand-subtitle">Lost and Found · Tagkawayan Campus</span>
+                </span>
+            </a>
+
+            <!-- DARK MODE BUTTON -->
+            <button
+                type="button"
+                id="themeToggle"
+                class="theme-toggle"
+                aria-label="Switch to dark mode"
+                title="Toggle dark mode"
+            >
+                <span id="themeIcon" aria-hidden="true">☾</span>
+                <span class="theme-label">Dark mode</span>
+            </button>
+
+            <button
+                class="mobile-menu"
+                type="button"
+                id="menuToggle"
+                aria-label="Toggle navigation"
+                aria-expanded="false"
+                aria-controls="navLinks"
+            >
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+
+            <div class="nav-links" id="navLinks">
+
+                <a class="nav-link" href="{{ url_for('index') }}">
+                    <i class="fa-solid fa-house" aria-hidden="true"></i>
+                    Home
+                </a>
+
+                <a class="nav-link" href="{{ url_for('index') }}#items">
+                    <i class="fa-solid fa-box-open" aria-hidden="true"></i>
+                    Lost & Found Items
+                </a>
+
+                <a class="nav-link" href="{{ url_for('index') }}#report">
+                    <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i>
+                    Report an Item
+                </a>
+
+                {% if session.get('is_admin') %}
+
+                    <a class="nav-link admin-link" href="{{ url_for('admin_dashboard') }}">
+                        <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
+                        Admin Dashboard
+                    </a>
+
+                    <form action="{{ url_for('admin_logout') }}" method="POST" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                        <button class="nav-link" type="submit"
+                            style="text-align:left;">
+                            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+                            Logout
+                        </button>
+                    </form>
+
+                {% else %}
+
+                    <a class="nav-link admin-link" href="{{ url_for('admin_login') }}">
+                        <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                        Admin Login
+                    </a>
+
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-container">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+
+                <div class="flash-container" role="status" aria-live="polite">
+
+                    {% for category, message in messages %}
+
+                        <div class="flash-message flash-{{ category }}">
+
+                            {% if category == 'success' %}
+                                <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+
+                            {% elif category == 'error' or category == 'danger' %}
+                                <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+
+                            {% elif category == 'warning' %}
+                                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+
+                            {% else %}
+                                <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                            {% endif %}
+
+                            <span>{{ message }}</span>
+                        </div>
+
+                    {% endfor %}
+                </div>
+
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+
+            <div>
+                <div class="footer-brand">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    SLSU-JGE FindHub
+                </div>
+
+                <p class="footer-description">
+                    Helping the SLSU-JGE Tagkawayan Campus community report,
+                    find, and return lost belongings.
+                </p>
+            </div>
+
+            <div class="footer-copy">
+                <p>&copy; {{ now_year if now_year is defined else 2026 }} SLSU-JGE FindHub</p>
+                <p>Southern Luzon State University · Tagkawayan Campus</p>
+            </div>
+
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            /* DARK MODE */
+            const themeToggle = document.getElementById("themeToggle");
+            const themeIcon = document.getElementById("themeIcon");
+            const themeLabel = document.querySelector(".theme-label");
+
+            function applyTheme(theme) {
+                const isDark = theme === "dark";
+
+                document.body.classList.toggle("dark-mode", isDark);
+
+                if (themeIcon) {
+                    themeIcon.textContent = isDark ? "☀" : "☾";
+                }
+
+                if (themeLabel) {
+                    themeLabel.textContent = isDark ? "Light mode" : "Dark mode";
+                }
+
+                if (themeToggle) {
+                    themeToggle.setAttribute(
+                        "aria-label",
+                        isDark ? "Switch to light mode" : "Switch to dark mode"
+                    );
+
+                    themeToggle.setAttribute(
+                        "title",
+                        isDark ? "Switch to light mode" : "Switch to dark mode"
+                    );
+                }
+            }
+
+            let savedTheme = "light";
+
+            try {
+                savedTheme = localStorage.getItem("findhub-theme") || "light";
+            } catch (error) {
+                savedTheme = "light";
+            }
+
+            applyTheme(savedTheme);
+
+            if (themeToggle) {
+                themeToggle.addEventListener("click", function () {
+                    const isDark = document.body.classList.contains("dark-mode");
+                    const newTheme = isDark ? "light" : "dark";
+
+                    applyTheme(newTheme);
+
+                    try {
+                        localStorage.setItem("findhub-theme", newTheme);
+                    } catch (error) {
+                        // Theme works for the current page.
+                    }
+                });
+            }
+
+            /* MOBILE MENU */
+            const menuButton = document.getElementById("menuToggle");
+            const navLinks = document.getElementById("navLinks");
+
+            if (menuButton && navLinks) {
+                menuButton.addEventListener("click", function () {
+                    const isOpen = navLinks.classList.toggle("open");
+
+                    menuButton.setAttribute("aria-expanded", String(isOpen));
+
+                    const icon = menuButton.querySelector("i");
+
+                    if (icon) {
+                        icon.className = isOpen
+                            ? "fa-solid fa-xmark"
+                            : "fa-solid fa-bars";
+                    }
+                });
+
+                navLinks.querySelectorAll("a").forEach(function (link) {
+                    link.addEventListener("click", function () {
+                        navLinks.classList.remove("open");
+                        menuButton.setAttribute("aria-expanded", "false");
+
+                        const icon = menuButton.querySelector("i");
+
+                        if (icon) {
+                            icon.className = "fa-solid fa-bars";
+                        }
+                    });
+                });
+            }
+
+            /* CONFIRMATION DIALOGS */
+            document.querySelectorAll("[data-confirm]").forEach(function (element) {
+                element.addEventListener("click", function (event) {
+                    const message = element.getAttribute("data-confirm")
+                        || "Are you sure you want to continue?";
+
+                    if (!window.confirm(message)) {
+                        event.preventDefault();
+                    }
+                });
+            });
+
+        });
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
