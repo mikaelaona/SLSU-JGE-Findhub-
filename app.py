@@ -6,10 +6,11 @@ from functools import wraps
 
 from flask import (
     Flask, render_template, request, redirect,
-    url_for, flash, session, abort, make_response
+    url_for, flash, session, abort, make_response, jsonify
 )
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import desc
+from sqlalchemy import desc, or_
+
 
 app = Flask(__name__)
 
@@ -26,26 +27,24 @@ if database_url.startswith("postgres://"):
         "postgres://", "postgresql://", 1
     )
 
+if database_url.startswith("postgresql://"):
+    database_url = database_url.replace(
+        "postgresql://", "postgresql+psycopg://", 1
+    )
+
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
 db = SQLAlchemy(app)
 
-ALLOWED_IMAGE_TYPES = {
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-}
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
+VALID_STATUSES = {"Lost", "Found", "Returned"}
 
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    report_type = db.Column(
-        db.String(20), nullable=False, default="Lost"
-    )
+    report_type = db.Column(db.String(20), nullable=False, default="Lost")
     item_name = db.Column(db.String(120), nullable=False)
-    category = db.Column(
-        db.String(80), nullable=False, default="Other"
-    )
+    category = db.Column(db.String(80), nullable=False, default="Other")
     location = db.Column(db.String(150), nullable=False)
     date_reported = db.Column(db.String(20), nullable=False)
     reporter_name = db.Column(db.String(120), nullable=False)
@@ -88,10 +87,7 @@ def validate_csrf():
         ):
             abort(
                 400,
-                description=(
-                    "Your session token is invalid or expired. "
-                    "Reload the page and try again."
-                ),
+                description="Session token expired. Reload the page and try again."
             )
 
 
@@ -102,7 +98,6 @@ def admin_required(view):
             flash("Please sign in to access the admin dashboard.", "warning")
             return redirect(url_for("admin_login"))
         return view(*args, **kwargs)
-
     return wrapped
 
 
@@ -144,11 +139,15 @@ def submit_report():
             return redirect(url_for("index") + "#report")
 
         image_data = image.read()
-        image_mimetype = image.mimetype
 
         if len(image_data) > 5 * 1024 * 1024:
             flash("The image must be 5 MB or smaller.", "error")
             return redirect(url_for("index") + "#report")
+
+        if image_data:
+            image_mimetype = image.mimetype
+        else:
+            image_data = None
 
     item = Item(
         report_type=report_type,
@@ -164,10 +163,15 @@ def submit_report():
         image_mimetype=image_mimetype,
     )
 
-    db.session.add(item)
-    db.session.commit()
+    try:
+        db.session.add(item)
+        db.session.commit()
+        flash("Your report has been submitted successfully.", "success")
+    except Exception:
+        db.session.rollback()
+        app.logger.exception("Could not save item report.")
+        flash("Could not save your report. Please try again.", "error")
 
-    flash("Your report has been submitted successfully.", "success")
     return redirect(url_for("index") + "#items")
 
 
@@ -183,16 +187,40 @@ def item_image(item_id):
         item.image_mimetype or "application/octet-stream"
     )
     response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["Cache-Control"] = "public, max-age=3600"
-
+    response.headers["Cache-Control"] = "private, max-age=3600"
     return response
+
+
+def search_items(query="", status="all"):
+    items_query = Item.query
+
+    if query:
+        pattern = f"%{query}%"
+        items_query = items_query.filter(
+            or_(
+                Item.item_name.ilike(pattern),
+                Item.category.ilike(pattern),
+                Item.location.ilike(pattern),
+                Item.description.ilike(pattern),
+            )
+        )
+
+    if status.lower() in {"lost", "found", "returned"}:
+        items_query = items_query.filter(
+            Item.status == status.title()
+        )
+
+    return items_query.order_by(desc(Item.created_at))
 
 
 @app.route("/api/items")
 def api_items():
-    items = Item.query.order_by(desc(Item.created_at)).all()
+    query = request.args.get("q", "").strip()[:100]
+    status = request.args.get("status", "all").strip().lower()
 
-    return {
+    items = search_items(query, status).limit(200).all()
+
+    return jsonify({
         "items": [
             {
                 "id": item.id,
@@ -208,8 +236,9 @@ def api_items():
                 ),
             }
             for item in items
-        ]
-    }
+        ],
+        "count": len(items),
+    })
 
 
 @app.route("/admin/login", methods=["GET", "POST"])
@@ -230,7 +259,6 @@ def admin_login():
             session.clear()
             session["is_admin"] = True
             get_csrf_token()
-
             flash("Welcome to the admin dashboard.", "success")
             return redirect(url_for("admin_dashboard"))
 
@@ -260,23 +288,31 @@ def update_item_status(item_id):
     item = db.get_or_404(Item, item_id)
     status = request.form.get("status", "").title()
 
-    if status not in {"Lost", "Found", "Returned"}:
+    if status not in VALID_STATUSES:
         flash("Invalid status selected.", "error")
         return redirect(url_for("admin_dashboard"))
 
-    item.status = status
-    db.session.commit()
+    try:
+        item.status = status
+        db.session.commit()
+        flash(f'Status for "{item.item_name}" updated to {status}.', "success")
+    except Exception:
+        db.session.rollback()
+        app.logger.exception("Could not update item status.")
+        flash("Could not update the item. Please try again.", "error")
 
-    flash(
-        f'Status for "{item.item_name}" updated to {status}.',
-        "success",
-    )
     return redirect(url_for("admin_dashboard"))
 
 
 @app.route("/health")
 def health():
-    return {"status": "ok"}
+    try:
+        db.session.execute(db.select(1))
+        return {"status": "ok", "database": "connected"}, 200
+    except Exception:
+        db.session.rollback()
+        app.logger.exception("Database health check failed.")
+        return {"status": "error", "database": "unavailable"}, 503
 
 
 @app.errorhandler(400)
@@ -316,9 +352,13 @@ def server_error(error):
     ), 500
 
 
+# Create missing tables when Gunicorn imports this module.
+initialize_database()
+
+
 if __name__ == "__main__":
-    initialize_database()
     app.run(
         debug=os.environ.get("FLASK_DEBUG") == "1",
+        host="0.0.0.0",
         port=int(os.environ.get("PORT", 5000)),
     )
