@@ -1,0 +1,577 @@
+<escape>{% raw %}</escape>{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | SLSU-JGE FindHub{% endblock %}
+
+{% block extra_head %}
+<style>
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .dashboard-heading h1 {
+        margin-top: 5px;
+        font-family: 'Manrope', sans-serif;
+        font-size: clamp(27px, 4vw, 36px);
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+
+    .dashboard-heading p {
+        margin-top: 7px;
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+    .dashboard-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .dashboard-stat {
+        padding: 20px;
+        border: 1px solid var(--border);
+        border-radius: 15px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+    }
+
+    .dashboard-stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .dashboard-stat-icon {
+        display: grid;
+        place-items: center;
+        width: 37px;
+        height: 37px;
+        border-radius: 11px;
+        background: var(--primary-light);
+        color: var(--primary);
+        font-size: 15px;
+    }
+
+    .dashboard-stat-number {
+        margin-top: 12px;
+        font-family: 'Manrope', sans-serif;
+        font-size: 30px;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .dashboard-stat-note {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 11px;
+    }
+
+    .dashboard-panel {
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+    }
+
+    .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
+        padding: 22px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .panel-header h2 {
+        font-family: 'Manrope', sans-serif;
+        font-size: 19px;
+        font-weight: 800;
+    }
+
+    .panel-header p {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    .dashboard-filters {
+        display: grid;
+        grid-template-columns: minmax(180px, 1fr) 180px;
+        gap: 12px;
+        width: min(480px, 100%);
+    }
+
+    .dashboard-table-wrap {
+        overflow-x: auto;
+    }
+
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .admin-table th {
+        padding: 13px 15px;
+        background: #f5f8f5;
+        color: #68776d;
+        font-size: 10px;
+        letter-spacing: .6px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .admin-table td {
+        padding: 15px;
+        border-top: 1px solid var(--border);
+        font-size: 12px;
+        vertical-align: middle;
+    }
+
+    .admin-table tbody tr:hover {
+        background: #fafcfb;
+    }
+
+    .admin-item {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-width: 190px;
+    }
+
+    .admin-item-image {
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        overflow: hidden;
+        border-radius: 10px;
+        background: #edf2ee;
+        color: #94a89a;
+        font-size: 17px;
+    }
+
+    .admin-item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .admin-item-name {
+        font-weight: 800;
+        color: var(--text);
+        overflow-wrap: anywhere;
+    }
+
+    .admin-item-category {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 11px;
+    }
+
+    .admin-description {
+        max-width: 210px;
+        color: var(--muted);
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+
+    .status-form {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        min-width: 200px;
+    }
+
+    .status-form select {
+        min-width: 105px;
+        min-height: 37px;
+        padding: 7px 9px;
+        font-size: 11px;
+    }
+
+    .status-form button {
+        min-height: 37px;
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+
+    .admin-contact {
+        max-width: 170px;
+        overflow-wrap: anywhere;
+        color: var(--muted);
+        line-height: 1.7;
+    }
+
+    .dashboard-empty {
+        padding: 45px 20px;
+        text-align: center;
+    }
+
+    .dashboard-empty i {
+        margin-bottom: 12px;
+        color: #9caf9f;
+        font-size: 35px;
+    }
+
+    .dashboard-empty h3 {
+        font-family: 'Manrope', sans-serif;
+        font-size: 18px;
+    }
+
+    .dashboard-empty p {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+    .table-footer {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 15px 20px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 11px;
+    }
+
+    @media (max-width: 900px) {
+        .dashboard-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 600px) {
+        .dashboard-stats {
+            gap: 10px;
+        }
+
+        .dashboard-stat {
+            padding: 14px;
+        }
+
+        .dashboard-stat-number {
+            font-size: 25px;
+        }
+
+        .dashboard-stat-top {
+            align-items: flex-start;
+            font-size: 11px;
+        }
+
+        .panel-header {
+            padding: 17px;
+        }
+
+        .dashboard-filters {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-actions {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section>
+    <div class="dashboard-header">
+        <div class="dashboard-heading">
+            <div class="section-kicker">
+                <i class="fa-solid fa-gauge-high"></i>
+                Administration
+            </div>
+
+            <h1>Admin Dashboard</h1>
+
+            <p>
+                Manage and monitor lost and found reports at SLSU-JGE Tagkawayan Campus.
+            </p>
+        </div>
+
+        <div class="dashboard-actions">
+            <a href="{{ url_for('index') }}" class="btn btn-outline">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                View Website
+            </a>
+
+            <form action="{{ url_for('admin_logout') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                <button type="submit" class="btn btn-danger">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Logout
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="dashboard-stats">
+        <div class="dashboard-stat">
+            <div class="dashboard-stat-top">
+                <span>Total Reports</span>
+                <span class="dashboard-stat-icon">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </span>
+            </div>
+            <div class="dashboard-stat-number">{{ items|length }}</div>
+            <div class="dashboard-stat-note">All submitted reports</div>
+        </div>
+
+        <div class="dashboard-stat">
+            <div class="dashboard-stat-top">
+                <span>Lost Items</span>
+                <span class="dashboard-stat-icon">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+            </div>
+            <div class="dashboard-stat-number">
+                {{ items|selectattr('status', 'equalto', 'Lost')|list|length }}
+            </div>
+            <div class="dashboard-stat-note">Items reported missing</div>
+        </div>
+
+        <div class="dashboard-stat">
+            <div class="dashboard-stat-top">
+                <span>Found Items</span>
+                <span class="dashboard-stat-icon">
+                    <i class="fa-solid fa-box-open"></i>
+                </span>
+            </div>
+            <div class="dashboard-stat-number">
+                {{ items|selectattr('status', 'equalto', 'Found')|list|length }}
+            </div>
+            <div class="dashboard-stat-note">Items reported found</div>
+        </div>
+
+        <div class="dashboard-stat">
+            <div class="dashboard-stat-top">
+                <span>Returned Items</span>
+                <span class="dashboard-stat-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </span>
+            </div>
+            <div class="dashboard-stat-number">
+                {{ items|selectattr('status', 'equalto', 'Returned')|list|length }}
+            </div>
+            <div class="dashboard-stat-note">Items marked as returned</div>
+        </div>
+    </div>
+
+    <!-- Reports table -->
+    <div class="dashboard-panel">
+        <div class="panel-header">
+            <div>
+                <h2>Item Reports</h2>
+                <p>Review reports and update their current status.</p>
+            </div>
+
+            <div class="dashboard-filters">
+                <input
+                    type="search"
+                    id="adminSearch"
+                    class="form-control"
+                    placeholder="Search reports..."
+                    aria-label="Search item reports"
+                >
+
+                <select id="adminStatusFilter" class="form-control" aria-label="Filter reports by status">
+                    <option value="all">All Statuses</option>
+                    <option value="Lost">Lost</option>
+                    <option value="Found">Found</option>
+                    <option value="Returned">Returned</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="dashboard-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Status</th>
+                        <th>Location & Date</th>
+                        <th>Reporter & Contact</th>
+                        <th>Description</th>
+                        <th>Update Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="adminItemsBody">
+                    {% for item in items %}
+                    <tr
+                        class="admin-report-row"
+                        data-status="{{ item.status }}"
+                        data-search="{{ (item.item_name ~ ' ' ~ item.category ~ ' ' ~ item.location ~ ' ' ~ item.reporter_name ~ ' ' ~ item.contact_info ~ ' ' ~ item.description)|lower }}"
+                    >
+                        <td>
+                            <div class="admin-item">
+                                <div class="admin-item-image">
+                                    {% if item.image_data %}
+                                        <img
+                                            src="{{ url_for('item_image', item_id=item.id) }}"
+                                            alt="{{ item.item_name }}"
+                                            loading="lazy"
+                                        >
+                                    {% else %}
+                                        <i class="fa-regular fa-image"></i>
+                                    {% endif %}
+                                </div>
+
+                                <div>
+                                    <div class="admin-item-name">{{ item.item_name }}</div>
+                                    <div class="admin-item-category">{{ item.category }}</div>
+                                    <div class="text-muted">Report #{{ item.id }}</div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="status-badge {{ item.status|lower }}">
+                                {{ item.status }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div>
+                                <i class="fa-solid fa-location-dot text-muted"></i>
+                                {{ item.location }}
+                            </div>
+                            <div class="text-muted" style="margin-top:6px">
+                                <i class="fa-regular fa-calendar"></i>
+                                {{ item.date_reported }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <div style="font-weight:700">{{ item.reporter_name }}</div>
+                            <div class="admin-contact">{{ item.contact_info }}</div>
+                        </td>
+
+                        <td>
+                            <div class="admin-description">{{ item.description }}</div>
+                        </td>
+
+                        <td>
+                            <form
+                                class="status-form"
+                                action="{{ url_for('update_item_status', item_id=item.id) }}"
+                                method="POST"
+                            >
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                                <select
+                                    name="status"
+                                    class="form-control"
+                                    aria-label="New status for {{ item.item_name }}"
+                                    required
+                                >
+                                    <option value="Lost" {% if item.status == 'Lost' %}selected{% endif %}>Lost</option>
+                                    <option value="Found" {% if item.status == 'Found' %}selected{% endif %}>Found</option>
+                                    <option value="Returned" {% if item.status == 'Returned' %}selected{% endif %}>Returned</option>
+                                </select>
+
+                                <button type="submit" class="btn btn-primary" title="Save status">
+                                    <i class="fa-solid fa-check"></i>
+                                    Save
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr id="adminNoItems">
+                        <td colspan="6">
+                            <div class="dashboard-empty">
+                                <i class="fa-solid fa-folder-open"></i>
+                                <h3>No reports yet</h3>
+                                <p>Submitted lost and found reports will appear here.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-footer">
+            <span id="adminResultsCount">Showing {{ items|length }} report(s)</span>
+            <span><i class="fa-solid fa-shield-halved"></i> Administrator access</span>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const search = document.getElementById('adminSearch');
+        const filter = document.getElementById('adminStatusFilter');
+        const rows = Array.from(document.querySelectorAll('.admin-report-row'));
+        const count = document.getElementById('adminResultsCount');
+
+        function applyFilters() {
+            const query = search.value.trim().toLowerCase();
+            const selectedStatus = filter.value;
+            let visible = 0;
+
+            rows.forEach(row => {
+                const matchesSearch =
+                    (row.dataset.search || '').includes(query);
+
+                const matchesStatus =
+                    selectedStatus === 'all' ||
+                    row.dataset.status === selectedStatus;
+
+                const show = matchesSearch && matchesStatus;
+                row.style.display = show ? '' : 'none';
+
+                if (show) visible++;
+            });
+
+            count.textContent = `Showing ${visible} of ${rows.length} report(s)`;
+        }
+
+        search.addEventListener('input', applyFilters);
+        filter.addEventListener('change', applyFilters);
+
+        document.querySelectorAll('.status-form').forEach(form => {
+            form.addEventListener('submit', function (event) {
+                const select = form.querySelector('select[name="status"]');
+                const currentStatus = form.closest('tr').dataset.status;
+
+                if (select.value === currentStatus) {
+                    const proceed = window.confirm(
+                        'The selected status is the same as the current status. Save anyway?'
+                    );
+
+                    if (!proceed) event.preventDefault();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+<escape>{% endraw %}</escape>
