@@ -1,0 +1,154 @@
+<escape>{% raw %}</escape>{% extends "base.html" %}
+
+{% block title %}Error {{ error_code }} | SLSU-JGE FindHub{% endblock %}
+
+{% block extra_head %}
+<style>
+    .error-page {
+        min-height: 65vh;
+        display: grid;
+        place-items: center;
+        padding: 35px 0;
+    }
+
+    .error-card {
+        width: min(580px, 100%);
+        padding: 45px 35px;
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        background: var(--surface);
+        box-shadow: 0 15px 45px rgba(20, 56, 38, .07);
+        text-align: center;
+    }
+
+    .error-icon {
+        display: grid;
+        place-items: center;
+        width: 82px;
+        height: 82px;
+        margin: 0 auto 22px;
+        border-radius: 24px;
+        background: #edf5ef;
+        color: var(--primary);
+        font-size: 33px;
+    }
+
+    .error-code {
+        color: var(--primary);
+        font-family: 'Manrope', sans-serif;
+        font-size: clamp(54px, 12vw, 82px);
+        font-weight: 800;
+        letter-spacing: -4px;
+        line-height: 1.1;
+    }
+
+    .error-title {
+        margin-top: 12px;
+        font-family: 'Manrope', sans-serif;
+        font-size: 24px;
+        font-weight: 800;
+    }
+
+    .error-message {
+        max-width: 400px;
+        margin: 12px auto 25px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+        overflow-wrap: anywhere;
+    }
+
+    .error-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .error-help {
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 11px;
+    }
+
+    @media (max-width: 500px) {
+        .error-card {
+            padding: 35px 20px;
+        }
+
+        .error-title {
+            font-size: 21px;
+        }
+
+        .error-actions {
+            flex-direction: column;
+        }
+
+        .error-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="error-page">
+    <div class="error-card">
+        <div class="error-icon">
+            {% if error_code == 400 %}
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            {% elif error_code == 403 %}
+                <i class="fa-solid fa-lock"></i>
+            {% elif error_code == 404 %}
+                <i class="fa-solid fa-magnifying-glass"></i>
+            {% else %}
+                <i class="fa-solid fa-circle-exclamation"></i>
+            {% endif %}
+        </div>
+
+        <div class="error-code">{{ error_code }}</div>
+
+        <h1 class="error-title">
+            {% if error_code == 400 %}
+                Invalid Request
+            {% elif error_code == 403 %}
+                Access Denied
+            {% elif error_code == 404 %}
+                Page Not Found
+            {% elif error_code == 500 %}
+                Something Went Wrong
+            {% else %}
+                An Error Occurred
+            {% endif %}
+        </h1>
+
+        <p class="error-message">
+            {{ message }}
+        </p>
+
+        <div class="error-actions">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <i class="fa-solid fa-house"></i>
+                Back to Homepage
+            </a>
+
+            <button
+                type="button"
+                class="btn btn-outline"
+                onclick="window.history.back()"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                Go Back
+            </button>
+        </div>
+
+        <div class="error-help">
+            <i class="fa-solid fa-circle-info"></i>
+            If the problem continues, reload the page or try again later.
+        </div>
+    </div>
+</section>
+{% endblock %}
+<escape>{% endraw %}</escape>
