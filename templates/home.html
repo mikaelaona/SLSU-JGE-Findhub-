@@ -1,0 +1,897 @@
+<escape>{% raw %}</escape>{% extends "base.html" %}
+
+{% block title %}Home | SLSU-JGE FindHub{% endblock %}
+
+{% block extra_head %}
+<style>
+    .home-hero {
+        position: relative;
+        overflow: hidden;
+        padding: 58px 48px;
+        margin: 0 0 38px;
+        border-radius: 0 0 24px 24px;
+        background: linear-gradient(125deg, #103625, #1d6041);
+        color: white;
+    }
+
+    .home-hero::after {
+        content: "";
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        right: -75px;
+        top: -100px;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 50%;
+        box-shadow: 0 0 0 35px rgba(255,255,255,.035),
+                    0 0 0 75px rgba(255,255,255,.025);
+        pointer-events: none;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        max-width: 720px;
+    }
+
+    .hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border: 1px solid rgba(255,255,255,.2);
+        border-radius: 100px;
+        background: rgba(255,255,255,.08);
+        color: #e3d39f;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+    }
+
+    .hero-title {
+        max-width: 650px;
+        margin-top: 22px;
+        font-family: 'Manrope', sans-serif;
+        font-size: clamp(34px, 5vw, 55px);
+        font-weight: 800;
+        letter-spacing: -2px;
+        line-height: 1.12;
+    }
+
+    .hero-title span {
+        color: #e2c878;
+    }
+
+    .hero-description {
+        max-width: 540px;
+        margin-top: 18px;
+        color: #d5e5d9;
+        font-size: 15px;
+        line-height: 1.9;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+    }
+
+    .hero-actions .btn-primary {
+        background: #e0c675;
+        color: #173d29;
+    }
+
+    .hero-actions .btn-primary:hover {
+        background: #f0d990;
+    }
+
+    .hero-actions .btn-light {
+        border: 1px solid rgba(255,255,255,.35);
+        background: rgba(255,255,255,.08);
+        color: white;
+    }
+
+    .hero-actions .btn-light:hover {
+        background: rgba(255,255,255,.16);
+    }
+
+    .hero-note {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 25px;
+        color: #c5d9cb;
+        font-size: 12px;
+    }
+
+    .home-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 46px;
+    }
+
+    .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 22px;
+        border: 1px solid var(--border);
+        border-radius: 15px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+    }
+
+    .stat-icon {
+        display: grid;
+        place-items: center;
+        width: 47px;
+        height: 47px;
+        flex-shrink: 0;
+        border-radius: 13px;
+        background: var(--primary-light);
+        color: var(--primary);
+        font-size: 19px;
+    }
+
+    .stat-number {
+        font-family: 'Manrope', sans-serif;
+        font-size: 26px;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    .home-section {
+        margin-bottom: 48px;
+    }
+
+    .section-heading-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 18px;
+        margin-bottom: 22px;
+    }
+
+    .items-toolbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 180px;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .search-box {
+        position: relative;
+    }
+
+    .search-box > i {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        transform: translateY(-50%);
+        color: var(--muted);
+        pointer-events: none;
+    }
+
+    .search-box input {
+        padding-left: 43px;
+    }
+
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .item-card {
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        transition: transform .2s, box-shadow .2s;
+    }
+
+    .item-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 13px 32px rgba(20,56,38,.1);
+    }
+
+    .item-image {
+        display: grid;
+        place-items: center;
+        height: 195px;
+        overflow: hidden;
+        background: #edf2ee;
+        color: #a3b4a8;
+        font-size: 38px;
+    }
+
+    .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .item-content {
+        padding: 18px;
+    }
+
+    .item-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .item-name {
+        margin-bottom: 8px;
+        font-family: 'Manrope', sans-serif;
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+
+    .item-description {
+        display: -webkit-box;
+        overflow: hidden;
+        margin-bottom: 16px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+    }
+
+    .item-meta {
+        display: grid;
+        gap: 9px;
+        padding-top: 14px;
+        border-top: 1px solid var(--border);
+    }
+
+    .item-meta-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        color: #68786e;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .item-meta-row i {
+        width: 14px;
+        margin-top: 4px;
+        color: #62816d;
+    }
+
+    .item-category {
+        padding: 5px 9px;
+        border-radius: 7px;
+        background: #f0f4f1;
+        color: #536b5a;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .report-layout {
+        display: grid;
+        grid-template-columns: .75fr 1.25fr;
+        gap: 25px;
+        align-items: start;
+    }
+
+    .report-info {
+        padding: 28px;
+        border-radius: 17px;
+        background: #173f2b;
+        color: white;
+    }
+
+    .report-info-icon {
+        display: grid;
+        place-items: center;
+        width: 53px;
+        height: 53px;
+        margin-bottom: 20px;
+        border-radius: 15px;
+        background: rgba(255,255,255,.1);
+        color: #e3cc7f;
+        font-size: 22px;
+    }
+
+    .report-info h3 {
+        font-family: 'Manrope', sans-serif;
+        font-size: 24px;
+        line-height: 1.35;
+    }
+
+    .report-info > p {
+        margin-top: 12px;
+        color: #c8dbcd;
+        font-size: 13px;
+        line-height: 1.9;
+    }
+
+    .report-tip {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 24px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255,255,255,.16);
+        color: #d9e5dc;
+        font-size: 12px;
+    }
+
+    .report-tip i {
+        margin-top: 4px;
+        color: #e3cc7f;
+    }
+
+    .report-form-card {
+        padding: 27px;
+    }
+
+    .report-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0 15px;
+    }
+
+    .full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-submit {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    .results-count {
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+        .items-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .report-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .home-hero {
+            padding: 45px 30px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .home-hero {
+            padding: 39px 22px;
+            border-radius: 0 0 18px 18px;
+        }
+
+        .hero-title {
+            letter-spacing: -1.3px;
+        }
+
+        .hero-description {
+            font-size: 13px;
+        }
+
+        .hero-actions {
+            flex-direction: column;
+        }
+
+        .hero-actions .btn {
+            width: 100%;
+        }
+
+        .home-stats {
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 36px;
+        }
+
+        .stat-card {
+            padding: 15px;
+        }
+
+        .stat-icon {
+            width: 42px;
+            height: 42px;
+        }
+
+        .stat-number {
+            font-size: 23px;
+        }
+
+        .items-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .items-toolbar {
+            grid-template-columns: 1fr;
+        }
+
+        .section-heading-row {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .report-form-card, .report-info {
+            padding: 21px;
+        }
+
+        .report-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .full-width {
+            grid-column: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="home-hero">
+    <div class="hero-content">
+        <div class="hero-tag">
+            <i class="fa-solid fa-location-dot"></i>
+            SLSU-JGE Tagkawayan Campus
+        </div>
+
+        <h1 class="hero-title">
+            Lost something?
+            <br>
+            Let's help you <span>find it.</span>
+        </h1>
+
+        <p class="hero-description">
+            Welcome to SLSU-JGE FindHub, the campus lost and found
+            platform. Search for missing belongings, report items
+            you've found, and help return lost items to their owners.
+        </p>
+
+        <div class="hero-actions">
+            <a href="#items" class="btn btn-primary">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Find an Item
+            </a>
+
+            <a href="#report" class="btn btn-light">
+                <i class="fa-solid fa-plus"></i>
+                Report Lost or Found Item
+            </a>
+        </div>
+
+        <div class="hero-note">
+            <i class="fa-solid fa-shield-halved"></i>
+            For the SLSU-JGE Tagkawayan Campus community
+        </div>
+    </div>
+</section>
+
+<!-- STATISTICS -->
+<section class="home-stats" aria-label="Item report statistics">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fa-solid fa-box-open"></i>
+        </div>
+        <div>
+            <div class="stat-number">{{ items|length }}</div>
+            <div class="stat-label">Total Reported Items</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <div>
+            <div class="stat-number">{{ items|selectattr('status', 'equalto', 'Lost')|list|length }}</div>
+            <div class="stat-label">Lost Items</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div>
+            <div class="stat-number">{{ items|selectattr('status', 'equalto', 'Found')|list|length }}</div>
+            <div class="stat-label">Found Items</div>
+        </div>
+    </div>
+</section>
+
+<!-- ITEMS SECTION -->
+<section class="home-section" id="items">
+    <div class="section-heading-row">
+        <div class="section-heading" style="margin-bottom:0">
+            <div class="section-kicker">
+                <i class="fa-solid fa-layer-group"></i>
+                Community Reports
+            </div>
+            <h2 class="section-title">Lost & Found Items</h2>
+            <p class="section-description">
+                Browse reports and search for belongings reported on campus.
+            </p>
+        </div>
+
+        <a href="#report" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i>
+            Submit a Report
+        </a>
+    </div>
+
+    <div class="items-toolbar">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input
+                type="search"
+                id="itemSearch"
+                class="form-control"
+                placeholder="Search item, category, location..."
+                aria-label="Search reported items"
+            >
+        </div>
+
+        <select id="statusFilter" class="form-control" aria-label="Filter by item status">
+            <option value="all">All Items</option>
+            <option value="Lost">Lost Items</option>
+            <option value="Found">Found Items</option>
+            <option value="Returned">Returned Items</option>
+        </select>
+    </div>
+
+    <p class="results-count" id="resultsCount" style="margin-bottom:15px">
+        Showing {{ items|length }} item(s)
+    </p>
+
+    <div class="items-grid" id="itemsGrid">
+        {% for item in items %}
+        <article
+            class="item-card"
+            data-status="{{ item.status }}"
+            data-search="{{ (item.item_name ~ ' ' ~ item.category ~ ' ' ~ item.location ~ ' ' ~ item.description)|lower }}"
+        >
+            <div class="item-image">
+                {% if item.image_data %}
+                    <img
+                        src="{{ url_for('item_image', item_id=item.id) }}"
+                        alt="Photo of {{ item.item_name }}"
+                        loading="lazy"
+                    >
+                {% else %}
+                    <i class="fa-regular fa-image" aria-label="No image available"></i>
+                {% endif %}
+            </div>
+
+            <div class="item-content">
+                <div class="item-card-top">
+                    <span class="status-badge {{ item.status|lower }}">
+                        {% if item.status == 'Lost' %}
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        {% elif item.status == 'Found' %}
+                            <i class="fa-solid fa-circle-check"></i>
+                        {% else %}
+                            <i class="fa-solid fa-handshake"></i>
+                        {% endif %}
+                        {{ item.status }}
+                    </span>
+
+                    <span class="item-category">{{ item.category }}</span>
+                </div>
+
+                <h3 class="item-name">{{ item.item_name }}</h3>
+
+                <p class="item-description">{{ item.description }}</p>
+
+                <div class="item-meta">
+                    <div class="item-meta-row">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>{{ item.location }}</span>
+                    </div>
+
+                    <div class="item-meta-row">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span>{{ item.date_reported }}</span>
+                    </div>
+                </div>
+            </div>
+        </article>
+        {% else %}
+        <div class="empty-state" style="grid-column:1/-1" id="noItems">
+            <i class="fa-solid fa-box-open"></i>
+            <h3>No reports yet</h3>
+            <p>There are no lost or found items reported yet. You can submit the first report below.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="empty-state" id="noSearchResults" style="display:none;margin-top:15px">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <h3>No matching items</h3>
+        <p>Try a different keyword or select another status filter.</p>
+    </div>
+</section>
+
+<!-- REPORT FORM -->
+<section class="home-section" id="report">
+    <div class="section-heading">
+        <div class="section-kicker">
+            <i class="fa-solid fa-file-circle-plus"></i>
+            Submit a Report
+        </div>
+        <h2 class="section-title">Report a Lost or Found Item</h2>
+        <p class="section-description">
+            Fill out the form below with accurate details to help the owner identify the item.
+        </p>
+    </div>
+
+    <div class="report-layout">
+        <aside class="report-info">
+            <div class="report-info-icon">
+                <i class="fa-solid fa-hand-holding-heart"></i>
+            </div>
+
+            <h3>Help belongings find their way home.</h3>
+
+            <p>
+                Lost an important item? Found something on campus?
+                Submit a report so the SLSU-JGE community can help
+                reconnect belongings with their owners.
+            </p>
+
+            <div class="report-tip">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span>
+                    <strong>Helpful tip</strong><br>
+                    Include the correct location, date, and a clear description.
+                    A photo can also help identify the item.
+                </span>
+            </div>
+
+            <div class="report-tip">
+                <i class="fa-solid fa-user-shield"></i>
+                <span>
+                    Use accurate contact information so you can be reached
+                    about your report. Avoid including passwords or other
+                    sensitive personal information in the description.
+                </span>
+            </div>
+        </aside>
+
+        <div class="card report-form-card">
+            <form
+                action="{{ url_for('submit_report') }}"
+                method="POST"
+                enctype="multipart/form-data"
+            >
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                <div class="report-form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="report_type">Report Type *</label>
+                        <select
+                            class="form-control"
+                            id="report_type"
+                            name="report_type"
+                            required
+                        >
+                            <option value="">Select report type</option>
+                            <option value="Lost">I lost an item</option>
+                            <option value="Found">I found an item</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="item_name">Item Name *</label>
+                        <input
+                            class="form-control"
+                            id="item_name"
+                            name="item_name"
+                            type="text"
+                            maxlength="120"
+                            placeholder="e.g. Student ID"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="category">Category *</label>
+                        <select class="form-control" id="category" name="category" required>
+                            <option value="">Select category</option>
+                            <option value="Identification">ID / Identification</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="School Supplies">School Supplies</option>
+                            <option value="Wallet / Money">Wallet / Money</option>
+                            <option value="Keys">Keys</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Bags">Bags</option>
+                            <option value="Documents">Documents</option>
+                            <option value="Accessories">Accessories</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="date_reported">Date *</label>
+                        <input
+                            class="form-control"
+                            id="date_reported"
+                            name="date_reported"
+                            type="date"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label" for="location">Location *</label>
+                        <input
+                            class="form-control"
+                            id="location"
+                            name="location"
+                            type="text"
+                            maxlength="150"
+                            placeholder="Where was the item lost or found?"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="reporter_name">Your Name *</label>
+                        <input
+                            class="form-control"
+                            id="reporter_name"
+                            name="reporter_name"
+                            type="text"
+                            maxlength="120"
+                            placeholder="Full name"
+                            autocomplete="name"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="contact_info">Contact Information *</label>
+                        <input
+                            class="form-control"
+                            id="contact_info"
+                            name="contact_info"
+                            type="text"
+                            maxlength="150"
+                            placeholder="Email or contact number"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label" for="description">Item Description *</label>
+                        <textarea
+                            class="form-control"
+                            id="description"
+                            name="description"
+                            maxlength="3000"
+                            placeholder="Describe the item, including its color, brand, or other identifying details."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label" for="image">Item Photo (Optional)</label>
+                        <input
+                            class="form-control"
+                            id="image"
+                            name="image"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                        >
+                        <span class="form-help">Accepted formats: JPG, PNG, WebP. Maximum size: 5 MB.</span>
+                    </div>
+
+                    <div class="full-width">
+                        <button type="submit" class="btn btn-primary form-submit">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            Submit Report
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('itemSearch');
+        const statusFilter = document.getElementById('statusFilter');
+        const itemCards = Array.from(document.querySelectorAll('.item-card'));
+        const resultsCount = document.getElementById('resultsCount');
+        const noResults = document.getElementById('noSearchResults');
+
+        function filterItems() {
+            const query = searchInput.value.trim().toLowerCase();
+            const selectedStatus = statusFilter.value;
+            let visibleCount = 0;
+
+            itemCards.forEach(card => {
+                const text = card.dataset.search || '';
+                const status = card.dataset.status || '';
+
+                const matchesSearch = text.includes(query);
+                const matchesStatus =
+                    selectedStatus === 'all' || status === selectedStatus;
+
+                const visible = matchesSearch && matchesStatus;
+                card.style.display = visible ? '' : 'none';
+
+                if (visible) visibleCount++;
+            });
+
+            resultsCount.textContent =
+                `Showing ${visibleCount} of ${itemCards.length} item(s)`;
+
+            noResults.style.display =
+                itemCards.length > 0 && visibleCount === 0 ? '' : 'none';
+        }
+
+        searchInput.addEventListener('input', filterItems);
+        statusFilter.addEventListener('change', filterItems);
+
+        const dateInput = document.getElementById('date_reported');
+        if (dateInput && !dateInput.value) {
+            const now = new Date();
+            const localDate = new Date(
+                now.getTime() - now.getTimezoneOffset() * 60000
+            ).toISOString().slice(0, 10);
+
+            dateInput.value = localDate;
+        }
+
+        const imageInput = document.getElementById('image');
+        if (imageInput) {
+            imageInput.addEventListener('change', function () {
+                const file = this.files && this.files[0];
+                if (!file) return;
+
+                const allowedTypes = [
+                    'image/jpeg',
+                    'image/png',
+                    'image/webp'
+                ];
+
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Please upload a JPG, PNG, or WebP image.');
+                    this.value = '';
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('The image must be 5 MB or smaller.');
+                    this.value = '';
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}
+<escape>{% endraw %}</escape>
